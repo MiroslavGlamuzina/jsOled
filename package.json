@@ -1,0 +1,19 @@
+{
+  "name": "jsoled",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.mjs",
+  "scripts": {},
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "async-exec-cmd": "^2.0.2",
+    "johnny-five": "latest",
+    "oled-js": "latest",
+    "raspi-io": "latest",
+    "oled-font-5x7": "latest"
+  },
+  "devDependencies": {
+    "raspi-io": "latest"
+  }
+}
