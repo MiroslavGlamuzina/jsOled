@@ -32,7 +32,8 @@ let shouldUpdateSpeed = true;
 //    }
 //};
 const execSpeedTest = () => {
-    console.log("executing command");
+    console.log("Running speedtest...");
+    startDate = new Date();
     return new Promise(acc => {
         exec('speedtest --simple | awk \'NR==2{print$2" "$3}\'', (err, res, code) => {
             acc();
