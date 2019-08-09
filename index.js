@@ -2,8 +2,7 @@ const {RaspiIO} = require('raspi-io');
 const Five = require('johnny-five');
 const OledJS = require('oled-js');
 const Font = require('oled-font-5x7');
-const Promisify = require('util').promisify;
-const exec = Promisify(require('child_process').exec);
+const exec = require('child_process').exec;
 
 // Globals
 const BOARD = new Five.Board({io: new RaspiIO()});
@@ -15,22 +14,31 @@ let data = {time: '', speed: ''};
 let startDate = new Date();
 let shouldUpdateSpeed = true;
 
+//const execSpeedTest = () => {
+//    if(shouldUpdateSpeed) {
+//        console.log('Exec speedTest...');
+//        shouldUpdateSpeed = false;
+//        exec('speedtest --simple | awk \'NR==2{print$2" "$3}\'', (err, res, code) => {
+//            if(err === null) {
+//                console.log("speedTest done");
+//                console.log(err, res, code);
+//                data.speed = res.replace(/\\\//g, "/").replace('Mbit/s', 'MB');
+//                startDate = new Date();
+//            } else {
+//                console.error("ERROR: Speedtest failed to retrieve data!", err, res, code);
+//            }
+//            shouldUpdateSpeed = true;
+//        });
+//    }
+//};
 const execSpeedTest = () => {
-    if(shouldUpdateSpeed) {
-        console.log('Exec speedTest...');
-        shouldUpdateSpeed = false;
+    console.log("executing command");
+    return new Promise(acc => {
         exec('speedtest --simple | awk \'NR==2{print$2" "$3}\'', (err, res, code) => {
-            if(err === null) {
-                console.log("speedTest done");
-                console.log(err, res, code);
-                data.speed = res.replace(/\\\//g, "/").replace('Mbit/s', 'MB');
-                startDate = new Date();
-            } else {
-                console.error("ERROR: Speedtest failed to retrieve data!", err, res, code);
-            }
-            shouldUpdateSpeed = true;
+            acc();
+            data.speed = res.replace(/\\\//g, "/").replace('Mbit/s', 'MB');
         });
-    }
+    }).then(() => setTimeout(function() { execSpeedTest(); }, 1000));
 };
 
 const getTimeDiff = startDate => {
@@ -44,7 +52,6 @@ const getTimeDiff = startDate => {
 execSpeedTest(); // Run on start
 BOARD.on('ready', () => {
     const oled = new OledJS(BOARD, Five, OPTS);
-    setInterval(execSpeedTest, INTERVAL.speedTest);
 
     // Clear screen
     oled.fillRect(0, 0, 128, 32, 0);
