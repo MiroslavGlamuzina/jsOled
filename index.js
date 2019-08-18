@@ -6,41 +6,12 @@ const exec = require('child_process').exec;
 
 // Globals
 const BOARD = new Five.Board({io: new RaspiIO()});
-const INTERVAL = {time: 2000, speedTest: 60000};
+const INTERVAL = {time: 2000, speedTest: 900000};
 const ANIM = [">   ", ">>  ", ">>> ", ">>>>"];
 const OPTS = {width: 128, height: 32, address: 0x3c};
 let animIndex = 0;
 let data = {time: '', speed: ''};
 let startDate = new Date();
-let shouldUpdateSpeed = true;
-
-//const execSpeedTest = () => {
-//    if(shouldUpdateSpeed) {
-//        console.log('Exec speedTest...');
-//        shouldUpdateSpeed = false;
-//        exec('speedtest --simple | awk \'NR==2{print$2" "$3}\'', (err, res, code) => {
-//            if(err === null) {
-//                console.log("speedTest done");
-//                console.log(err, res, code);
-//                data.speed = res.replace(/\\\//g, "/").replace('Mbit/s', 'MB');
-//                startDate = new Date();
-//            } else {
-//                console.error("ERROR: Speedtest failed to retrieve data!", err, res, code);
-//            }
-//            shouldUpdateSpeed = true;
-//        });
-//    }
-//};
-const execSpeedTest = () => {
-    console.log("Running speedtest...");
-    startDate = new Date();
-    return new Promise(acc => {
-        exec('speedtest --simple | awk \'NR==2{print$2" "$3}\'', (err, res, code) => {
-            acc();
-            data.speed = res.replace(/\\\//g, "/").replace('Mbit/s', 'MB');
-        });
-    }).then(() => setTimeout(function() { execSpeedTest(); }, 1000));
-};
 
 const getTimeDiff = startDate => {
     const endDate = new Date();
@@ -48,6 +19,19 @@ const getTimeDiff = startDate => {
     let date = new Date(null);
     date.setSeconds(diffTime); // specify value for SECONDS here
     return date.toISOString().substr(14, 5);
+};
+
+const execSpeedTest = () => {
+    startDate = new Date();
+    return new Promise(acc => {
+        exec('speedtest --simple | awk \'NR==2{print$2" "$3}\'', (err, res, code) => {
+            res = res.replace(/\\\//g, "/").trim().replace('Mbit/s', 'MB');
+            if(res.length > 1) {
+                data.speed = res;
+            }
+            acc();
+        });
+    }).then(() => setTimeout(execSpeedTest, INTERVAL.speedTest));
 };
 
 execSpeedTest(); // Run on start
