@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.mjs",
-  "scripts": {},
+  "scripts": {
+    "start": "node index.js"
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
