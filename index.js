@@ -6,7 +6,7 @@ const exec = require('child_process').exec;
 
 // Globals
 const BOARD = new Five.Board({io: new RaspiIO()});
-const INTERVAL = {time: 2000, speedTest: 900000};
+const INTERVAL = {time: 2000, speedTest: 1800000};
 const ANIM = [">   ", ">>  ", ">>> ", ">>>>"];
 const OPTS = {width: 128, height: 32, address: 0x3c};
 let animIndex = 0;
