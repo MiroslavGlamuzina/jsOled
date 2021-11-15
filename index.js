@@ -35,7 +35,7 @@ const execSpeedTest = () => {
 };
 
 execSpeedTest(); // Run on start
-BOARD.on('ready', () => {
+BOARD.on('ready', () => { 
     const oled = new OledJS(BOARD, Five, OPTS);
 
     // Clear screen
